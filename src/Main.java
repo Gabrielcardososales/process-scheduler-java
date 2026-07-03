@@ -11,6 +11,9 @@ public class Main {
             System.out.println("Nenhum processo carregado. Verifique o arquivo.");
             return;
         }
+        ArrayList<Processo> listaFCFS = cloneLista(listaOriginal);
+        EscalonadorFCFS.executar(listaFCFS);
+        printResultados("FCFS", listaFCFS);
 
         // Exemplo futuro de como podemos chamar o algoritmo do escalonador
         // ArrayList<Processo> listaSJF = cloneLista(listaOriginal);
@@ -28,13 +31,20 @@ public class Main {
         return clone;
     }
 
-    // Print simples temporário (na função B voce melhora, mas ate então é isso)
-    private static void printResultados(ArrayList<Processo> processos) {
-        System.out.println("ID | Chegada | Burst | Início | Fim | Retorno | Espera");
-        for (Processo p : processos) {
-            System.out.printf("%s  | %7d | %5d | %6d | %3d | %7d | %6d\n",
-                    p.getId(), p.getTempoChegada(), p.getTempoExecucao(),
-                    p.getTempoInicio(), p.getTempoFim(), p.getTempoRetorno(), p.getTempoEspera());
+    // Imprime o resultado dos escalonadores
+    private static void printResultados(String sigla, ArrayList<Processo> processos) {
+        double tempRetornoMedio = 0, tempRespostaMedio = 0, tempEsperaMedio = 0;
+        int cont = processos.size();
+        for(Processo processo : processos) {
+            tempRetornoMedio += processo.getTempoRetorno();
+            tempRespostaMedio += processo.getTempoResposta();
+            tempEsperaMedio += processo.getTempoEspera();
         }
+
+        double mediaRetorno = tempRetornoMedio / cont;
+        double mediaResposta = tempRespostaMedio / cont;
+        double mediaEspera = tempEsperaMedio / cont;
+
+        System.out.printf("%s %.1f %.1f %.1f\n", sigla, mediaRetorno, mediaResposta, mediaEspera);
     }
 }

@@ -1,25 +1,33 @@
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Main {
     public static void main(String[] args) {
-        String arquivoTeste = "entrada.txt";
+        // Certifique-se de que o caminho do arquivo está correto para o ambiente de teste
+        String arquivoTeste = "src/data/entrada2.txt";
 
-        System.out.println("--- Carregando processos do arquivo ---");
         ArrayList<Processo> listaOriginal = LeitorArquivo.lerArquivo(arquivoTeste);
 
         if(listaOriginal.isEmpty()) {
-            System.out.println("Nenhum processo carregado. Verifique o arquivo.");
+            // Só printa erro se o arquivo realmente estiver vazio ou não encontrado
+            System.err.println("Nenhum processo carregado. Verifique o arquivo.");
             return;
         }
+
+        // FCFS
         ArrayList<Processo> listaFCFS = cloneLista(listaOriginal);
         EscalonadorFCFS.executar(listaFCFS);
-        printResultados("FCFS", listaFCFS);
+        printResultados("FCFS:", listaFCFS);
 
-        // Exemplo futuro de como podemos chamar o algoritmo do escalonador
-        // ArrayList<Processo> listaSJF = cloneLista(listaOriginal);
-        // EscalonadorSJF.executar(listaSJF);
-        // System.out.println("\n=== RESULTADO SJF ===");
-        // printResultados(listaSJF);
+        // SJF
+        ArrayList<Processo> listaSJF = cloneLista(listaOriginal);
+        EscalonadorSJF.executar(listaSJF);
+        printResultados("SJF:", listaSJF);
+
+        // RR (Corrigido o nome da sigla aqui)
+        ArrayList<Processo> listaRR = cloneLista(listaOriginal);
+        EscalonadorRR.executar(listaRR);
+        printResultados("RR:", listaRR);
     }
 
     // Método auxiliar para não misturar os dados entre execuções
@@ -31,10 +39,11 @@ public class Main {
         return clone;
     }
 
-    // Imprime o resultado dos escalonadores
+    // Imprime o resultado dos escalonadores EXATAMENTE como o corretor quer
     private static void printResultados(String sigla, ArrayList<Processo> processos) {
         double tempRetornoMedio = 0, tempRespostaMedio = 0, tempEsperaMedio = 0;
         int cont = processos.size();
+
         for(Processo processo : processos) {
             tempRetornoMedio += processo.getTempoRetorno();
             tempRespostaMedio += processo.getTempoResposta();
@@ -45,6 +54,9 @@ public class Main {
         double mediaResposta = tempRespostaMedio / cont;
         double mediaEspera = tempEsperaMedio / cont;
 
-        System.out.printf("%s %.1f %.1f %.1f\n", sigla, mediaRetorno, mediaResposta, mediaEspera);
+        // Locale.of("pt", "BR") garante que os decimais saiam com VÍRGULA (ex: 10,0)
+        // removendo possíveis quebras por configuração do sistema do professor.
+        System.out.printf(Locale.of("pt", "BR"), "%s %.1f %.1f %.1f\n",
+                sigla, mediaRetorno, mediaResposta, mediaEspera);
     }
 }
